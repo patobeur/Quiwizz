@@ -2,6 +2,15 @@
 
 require_once __DIR__ . '/bootstrap.php';
 
+// Gérer les requêtes JSON
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+    $json_data = file_get_contents('php://input');
+    $decoded_data = json_decode($json_data, true);
+    if (is_array($decoded_data)) {
+        $_POST = array_merge($_POST, $decoded_data);
+    }
+}
+
 // Le routeur principal de l'API
 $action = $_REQUEST['action'] ?? '';
 
