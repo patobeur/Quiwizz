@@ -23,9 +23,9 @@ return [
     // -- Configuration de l'envoi d'e-mails (PHPMailer) --
     'MAIL_HOST' => 'smtp.example.com',
     'MAIL_PORT' => 587,
-    'MAIL_USERNAME' => 'patobeur@patobeur.fr',
+    'MAIL_USERNAME' => 'name@name.fr',
     'MAIL_PASSWORD' => 'secret',
-    'MAIL_FROM_ADDRESS' => 'noreply@patobeur.fr',
+    'MAIL_FROM_ADDRESS' => 'noreply@name.fr',
     'MAIL_FROM_NAME' => 'QuiWizz',
     'MAIL_ENCRYPTION' => 'tls', // 'tls' ou 'ssl'
 
