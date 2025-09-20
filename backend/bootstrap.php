@@ -12,6 +12,51 @@ if (file_exists(__DIR__ . '/env.php') && (require __DIR__ . '/env.php')['DEBUG']
     // TODO: Mettre en place un logging des erreurs dans /backend/storage/logs
 }
 
+// -- Gestion globale des erreurs et exceptions --
+// Inclure response.php immédiatement pour qu'il soit disponible dans le gestionnaire d'exceptions.
+require_once __DIR__ . '/lib/response.php';
+
+set_exception_handler(function($exception) {
+    // On ne peut pas dépendre de la configuration globale ici, car une erreur peut
+    // survenir avant son chargement. On la charge donc spécifiquement.
+    $config = [];
+    if (file_exists(__DIR__ . '/env.php')) {
+        $config = require __DIR__ . '/env.php';
+    } else {
+        $config = require __DIR__ . '/env.example.php';
+    }
+
+    $isDebug = $config['DEBUG'] ?? false;
+    $errorMessage = 'Une erreur serveur est survenue.';
+    $errorDetails = null;
+
+    // En mode debug, on affiche les détails de l'erreur
+    if ($isDebug) {
+        $errorMessage = $exception->getMessage();
+        $errorDetails = [
+            'type' => get_class($exception),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'trace' => explode("\n", $exception->getTraceAsString()),
+        ];
+    }
+
+    // Logger l'erreur (peut être étendu pour logger dans un fichier)
+    error_log($exception);
+
+    // La fonction send_error_response est disponible car response.php est inclus avant.
+    send_error_response($errorMessage, 500, $errorDetails);
+});
+
+set_error_handler(function($severity, $message, $file, $line) {
+    if (!(error_reporting() & $severity)) {
+        // Ce code d'erreur n'est pas inclus dans error_reporting
+        return;
+    }
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
+
+
 // -- Chargement de la configuration --
 $config = [];
 if (file_exists(__DIR__ . '/env.php')) {
@@ -53,7 +98,6 @@ header('X-Frame-Options: DENY');
 header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
 
 // -- Inclusion des dépendances --
-require_once __DIR__ . '/lib/response.php';
 require_once __DIR__ . '/lib/security.php';
 require_once __DIR__ . '/lib/db.php';
 require_once __DIR__ . '/lib/auth.php';
