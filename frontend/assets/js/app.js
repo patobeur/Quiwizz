@@ -64,16 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Pour l'instant, on suppose déconnecté
             this.updateAuthState(auth.isLoggedIn(), auth.isUserAdmin());
 
-            // Initialiser les autres modules
-            auth.init();
-            profile.init();
-            admin.init();
+            // Initialiser les autres modules en leur passant l'instance de l'app
+            auth.init(this);
+            profile.init(this);
+            admin.init(this);
         }
     };
 
     // Lancer l'application
     app.init();
-
-    // Exposer app au global pour que les autres modules puissent y accéder
-    window.app = app;
 });
