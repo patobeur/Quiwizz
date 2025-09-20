@@ -26,7 +26,7 @@ class SimulatedMailer {
         $this->Password = $config['MAIL_PASSWORD'] ?? '';
         $this->SMTPSecure = $config['MAIL_ENCRYPTION'] ?? 'tls';
         $this->fromAddress = $config['MAIL_FROM_ADDRESS'] ?? 'noreply@example.com';
-        $this->fromName = $config['MAIL_FROM_NAME'] ?? 'Mon Application';
+        $this->fromName = $config['MAIL_FROM_NAME'] ?? 'QuiWizz';
         $this->SMTPAuth = true;
     }
 

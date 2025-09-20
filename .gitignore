@@ -1,2 +1,6 @@
 backend/storage/app.db
 backend/env.php
+backend/tests/bootstrap.php
+backend/tests/ProfileTest.php
+backend/composer.json
+backend/phpunit.xml.dist

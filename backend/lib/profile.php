@@ -24,11 +24,18 @@ function get_user_profile(PDO $pdo, int $userId): ?array {
  * @return array Résultat de l'opération.
  */
 function update_user_profile(PDO $pdo, int $userId, array $data): array {
-    // Validation
-    $pseudo = $data['pseudo'] ?? null;
-    $firstName = $data['first_name'] ?? null;
-    $lastName = $data['last_name'] ?? null;
+    // 1. Récupérer le profil existant pour obtenir les valeurs actuelles
+    $existingProfile = get_user_profile($pdo, $userId);
+    if (!$existingProfile) {
+        return ['success' => false, 'message' => 'Utilisateur non trouvé.'];
+    }
 
+    // 2. Fusionner les nouvelles données avec les données existantes
+    // Les valeurs dans $data écraseront celles dans $existingProfile
+    $updatedData = array_merge($existingProfile, $data);
+
+    // 3. Valider les données fusionnées
+    $pseudo = $updatedData['pseudo'];
     if (empty($pseudo)) {
         return ['success' => false, 'message' => 'Le pseudo ne peut pas être vide.'];
     }
@@ -36,21 +43,44 @@ function update_user_profile(PDO $pdo, int $userId, array $data): array {
         return ['success' => false, 'message' => 'Le pseudo doit contenir entre 3 et 50 caractères.'];
     }
 
-    // Vérifier si le nouveau pseudo est déjà pris par un autre utilisateur
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE pseudo = ? AND id != ?");
-    $stmt->execute([$pseudo, $userId]);
-    if ($stmt->fetch()) {
-        return ['success' => false, 'message' => 'Ce pseudo est déjà utilisé.'];
+    // 4. Vérifier si le nouveau pseudo est déjà pris par un autre utilisateur
+    // On vérifie seulement si le pseudo a réellement changé
+    if (isset($data['pseudo']) && $data['pseudo'] !== $existingProfile['pseudo']) {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE pseudo = ? AND id != ?");
+        $stmt->execute([$data['pseudo'], $userId]);
+        if ($stmt->fetch()) {
+            return ['success' => false, 'message' => 'Ce pseudo est déjà utilisé.'];
+        }
     }
 
-    // Mise à jour
-    $stmt = $pdo->prepare(
-        "UPDATE users SET pseudo = ?, first_name = ?, last_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
-    );
+    // 5. Construire la requête de mise à jour uniquement avec les champs qui ont changé
+    $fieldsToUpdate = [];
+    $params = [];
+    foreach ($data as $key => $value) {
+        // On ne met à jour que les champs autorisés et qui ont réellement une nouvelle valeur
+        if (in_array($key, ['pseudo', 'first_name', 'last_name']) && $value !== $existingProfile[$key]) {
+            $fieldsToUpdate[] = "$key = ?";
+            $params[] = $value;
+        }
+    }
 
-    if ($stmt->execute([$pseudo, $firstName, $lastName, $userId])) {
-        // Mettre à jour le pseudo dans la session également
-        $_SESSION['user_pseudo'] = $pseudo;
+    // S'il n'y a rien à mettre à jour, on retourne un succès sans rien faire
+    if (count($fieldsToUpdate) === 0) {
+        return ['success' => true, 'message' => 'Aucune modification détectée.'];
+    }
+
+    $fieldsToUpdate[] = "updated_at = CURRENT_TIMESTAMP";
+
+    $query = "UPDATE users SET " . implode(', ', $fieldsToUpdate) . " WHERE id = ?";
+    $params[] = $userId;
+
+    $stmt = $pdo->prepare($query);
+
+    if ($stmt->execute($params)) {
+        // Mettre à jour le pseudo dans la session également, s'il a été changé
+        if (isset($data['pseudo'])) {
+            $_SESSION['user_pseudo'] = $data['pseudo'];
+        }
         return ['success' => true, 'message' => 'Profil mis à jour avec succès.'];
     }
 

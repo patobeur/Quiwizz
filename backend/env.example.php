@@ -26,7 +26,7 @@ return [
     'MAIL_USERNAME' => 'user@example.com',
     'MAIL_PASSWORD' => 'secret',
     'MAIL_FROM_ADDRESS' => 'noreply@example.com',
-    'MAIL_FROM_NAME' => 'Mon Application',
+    'MAIL_FROM_NAME' => 'QuiWizz',
     'MAIL_ENCRYPTION' => 'tls', // 'tls' ou 'ssl'
 
     // -- Paramètres de l'application --
