@@ -171,6 +171,14 @@ switch ($action) {
         break;
 
     // --- Actions Administrateur ---
+    case 'admin/dashboard':
+        if (!is_user_admin()) { send_error_response('Accès non autorisé.', 403); }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') { send_error_response('Méthode non autorisée', 405); }
+
+        $dashboard_data = get_admin_dashboard_data($pdo);
+        send_json_response($dashboard_data);
+        break;
+
     case 'admin_get_users':
         if (!is_user_admin()) { send_error_response('Accès non autorisé.', 403); }
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') { send_error_response('Méthode non autorisée', 405); }

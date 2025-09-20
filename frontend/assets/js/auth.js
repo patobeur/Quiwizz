@@ -63,7 +63,7 @@ const auth = (() => {
             api.setCsrfToken(data.csrf_token);
             window.location.hash = 'profile';
         } catch (error) {
-            errorDiv.textContent = error.error || 'Une erreur est survenue.';
+            errorDiv.textContent = error.error || 'Une erreur est survenue. Err:2';
         }
     }
 
@@ -81,7 +81,7 @@ const auth = (() => {
             window.location.hash = 'login';
             // On pourrait ajouter un message de succès ici
         } catch (error) {
-            errorDiv.textContent = error.error || 'Une erreur est survenue.';
+            errorDiv.textContent = error.error || 'Une erreur est survenue. Err:3';
         }
     }
 
@@ -116,7 +116,7 @@ const auth = (() => {
             e.target.innerHTML = `<p>${data.message}</p>`;
         } catch (error) {
             // Ne pas afficher d'erreur spécifique pour des raisons de sécurité
-            errorDiv.textContent = 'Une erreur est survenue. Veuillez réessayer.';
+            errorDiv.textContent = 'Une erreur est survenue. Veuillez réessayer. Err:4';
         }
     }
 
@@ -139,7 +139,7 @@ const auth = (() => {
             // On pourrait stocker le message dans sessionStorage pour l'afficher sur la page de login
             sessionStorage.setItem('loginMessage', data.message);
         } catch (error) {
-             errorDiv.textContent = error.error || 'Une erreur est survenue.';
+             errorDiv.textContent = error.error || 'Une erreur est survenue. Err:5';
         }
     }
 

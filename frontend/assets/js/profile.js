@@ -100,7 +100,7 @@ const profile = (() => {
             await loadProfileAndBadgesData();
             hideEditForm();
         } catch (error) {
-            errorDiv.textContent = error.error || 'Une erreur est survenue.';
+            errorDiv.textContent = error.error || 'Une erreur est survenue. Err:6';
         }
     }
 
