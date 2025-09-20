@@ -169,6 +169,44 @@ switch ($action) {
         send_json_response($badges);
         break;
 
+    // --- Actions Administrateur ---
+    case 'admin_get_users':
+        if (!is_user_admin()) { send_error_response('Accès non autorisé.', 403); }
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') { send_error_response('Méthode non autorisée', 405); }
+
+        $users = get_all_users($pdo);
+        send_json_response($users);
+        break;
+
+    case 'admin_promote_user':
+        if (!is_user_admin()) { send_error_response('Accès non autorisé.', 403); }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { send_error_response('Méthode non autorisée', 405); }
+
+        $userId = (int)($_POST['user_id'] ?? 0);
+        if ($userId > 0 && promote_user_to_admin($pdo, $userId)) {
+            send_json_response(['success' => true, 'message' => 'Utilisateur promu administrateur.']);
+        } else {
+            send_error_response('Impossible de promouvoir l\'utilisateur.', 400);
+        }
+        break;
+
+    case 'admin_demote_user':
+        if (!is_user_admin()) { send_error_response('Accès non autorisé.', 403); }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { send_error_response('Méthode non autorisée', 405); }
+
+        $userId = (int)($_POST['user_id'] ?? 0);
+        // Empêcher un admin de se rétrograder lui-même
+        if ($userId === get_current_user_id()) {
+            send_error_response('Vous ne pouvez pas vous rétrograder vous-même.', 403);
+        }
+
+        if ($userId > 0 && demote_user_from_admin($pdo, $userId)) {
+            send_json_response(['success' => true, 'message' => 'Administrateur rétrogradé.']);
+        } else {
+            send_error_response('Impossible de rétrograder l\'administrateur.', 400);
+        }
+        break;
+
     default:
         // Si l'action n'est reconnue ni dans les routes publiques, ni ici, c'est une erreur.
         send_error_response('Action non reconnue.', 404);

@@ -62,6 +62,7 @@ function login_user(PDO $pdo, string $email, string $password): bool {
         // Stocker les informations de l'utilisateur dans la session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_pseudo'] = $user['pseudo'];
+        $_SESSION['is_admin'] = (bool)($user['is_admin'] ?? 0);
         return true;
     }
 
@@ -95,6 +96,15 @@ function logout_user() {
  */
 function is_user_logged_in(): bool {
     return isset($_SESSION['user_id']);
+}
+
+/**
+ * Vérifie si un utilisateur est administrateur.
+ *
+ * @return bool
+ */
+function is_user_admin(): bool {
+    return isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
 }
 
 /**

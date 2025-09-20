@@ -55,6 +55,7 @@ function create_tables_if_not_exists(PDO $pdo) {
         first_name VARCHAR(100),
         last_name VARCHAR(100),
         password_hash VARCHAR(255) NOT NULL,
+        is_admin INTEGER NOT NULL DEFAULT 0,
         reset_token VARCHAR(255),
         reset_expires_at DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

@@ -59,6 +59,7 @@ require_once __DIR__ . '/lib/db.php';
 require_once __DIR__ . '/lib/auth.php';
 require_once __DIR__ . '/lib/profile.php';
 require_once __DIR__ . '/lib/badges.php';
+require_once __DIR__ . '/lib/admin.php';
 // require_once __DIR__ . '/lib/mailer.php'; // Sera inclus plus tard quand nécessaire
 
 // Initialiser la connexion à la base de données
