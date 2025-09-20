@@ -14,7 +14,19 @@ function send_json_response($data, $statusCode = 200) {
 
     header('Content-Type: application/json; charset=utf-8');
     http_response_code($statusCode);
-    echo json_encode($data);
+
+    // Utiliser JSON_INVALID_UTF8_SUBSTITUTE pour éviter un échec de json_encode
+    // si les données de l'exception (message, trace) contiennent des caractères non-UTF8.
+    // Requiert PHP 7.2+
+    $json = json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE);
+
+    if ($json === false) {
+        // En cas d'échec de l'encodage (ex: récursion), envoyer une erreur JSON valide.
+        http_response_code(500); // S'assurer que le code est bien 500
+        $json = json_encode(['error' => 'Erreur critique du serveur: impossible de formater la réponse en JSON.']);
+    }
+
+    echo $json;
     exit;
 }
 

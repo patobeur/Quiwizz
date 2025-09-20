@@ -3,24 +3,23 @@ const admin = (() => {
     let adminNavLinks = {};
 
     function init() {
-        // Attendre que le DOM soit complètement chargé pour sélectionner les éléments
-        document.addEventListener('DOMContentLoaded', () => {
-            adminSections = {
-                dashboard: document.getElementById('admin-dashboard'),
-                users: document.getElementById('admin-users'),
-                polls: document.getElementById('admin-polls'),
-            };
+        // Les éléments sont sélectionnés directement, car app.js s'exécute après DOMContentLoaded
+        adminSections = {
+            dashboard: document.getElementById('admin-dashboard'),
+            users: document.getElementById('admin-users'),
+            polls: document.getElementById('admin-polls'),
+        };
 
-            adminNavLinks = document.querySelectorAll('.admin-nav-link');
-            adminNavLinks.forEach(link => {
-                link.addEventListener('click', handleAdminNav);
-            });
-
-            // Gérer la navigation initiale dans l'admin si on arrive directement sur une URL admin
-            handleAdminRoute();
+        adminNavLinks = document.querySelectorAll('.admin-nav-link');
+        adminNavLinks.forEach(link => {
+            link.addEventListener('click', handleAdminNav);
         });
 
-        // Écouter les changements de hash pour la navigation
+        // La gestion de la route est maintenant pilotée par app.js via hashchange
+        // On peut appeler handleAdminRoute une fois pour l'état initial
+        handleAdminRoute();
+
+        // Écouter les changements de hash pour la navigation dans les sous-sections admin
         window.addEventListener('hashchange', handleAdminRoute);
     }
 
@@ -171,10 +170,7 @@ const admin = (() => {
         }
     }
 
-    // Initialiser le module
-    init();
-
     return {
-        // Aucune fonction n'a besoin d'être exposée publiquement pour l'instant
+        init
     };
 })();

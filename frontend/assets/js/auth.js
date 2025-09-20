@@ -3,8 +3,11 @@ const auth = (() => {
     let isAdmin = false;
     let authReadyPromise;
     let resolveAuthReady;
+    let app; // Pour stocker la référence à l'instance de l'application principale
 
-    function init() {
+    function init(appInstance) {
+        app = appInstance; // Stocker la référence
+
         // Créer une promesse qui sera résolue lorsque l'authentification sera vérifiée
         authReadyPromise = new Promise(resolve => {
             resolveAuthReady = resolve;
@@ -29,7 +32,7 @@ const auth = (() => {
             if (data && data.id) {
                 loggedIn = true;
                 isAdmin = data.is_admin || false;
-                window.app.updateAuthState(true, isAdmin);
+                app.updateAuthState(true, isAdmin);
                 // Pré-remplir le token CSRF pour les actions futures
                 api.setCsrfToken(data.csrf_token);
             }
@@ -40,7 +43,7 @@ const auth = (() => {
             }
             loggedIn = false;
             isAdmin = false;
-            window.app.updateAuthState(false, false);
+            app.updateAuthState(false, false);
         } finally {
             // Résoudre la promesse pour indiquer que la vérification est terminée
             resolveAuthReady();
@@ -58,7 +61,7 @@ const auth = (() => {
             const data = await api.post('login', { email, password });
             loggedIn = true;
             isAdmin = data.user.is_admin || false;
-            window.app.updateAuthState(true, isAdmin);
+            app.updateAuthState(true, isAdmin);
             // Mettre à jour le token CSRF reçu après le login
             api.setCsrfToken(data.csrf_token);
             window.location.hash = 'profile';
@@ -92,14 +95,14 @@ const auth = (() => {
             loggedIn = false;
             isAdmin = false;
             api.setCsrfToken(null); // Invalider le token côté client
-            window.app.updateAuthState(false, false);
+            app.updateAuthState(false, false);
             window.location.hash = 'home';
         } catch (error) {
             console.error('Erreur lors de la déconnexion:', error);
             // Forcer la déconnexion côté client même si le serveur échoue
             loggedIn = false;
             isAdmin = false;
-            window.app.updateAuthState(false, false);
+            app.updateAuthState(false, false);
             window.location.hash = 'home';
         }
     }
