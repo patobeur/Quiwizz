@@ -30,16 +30,31 @@ const api = (() => {
 
         try {
             const response = await fetch(url, { ...options, headers });
-            const responseData = await response.json();
+            const contentType = response.headers.get('content-type');
 
+            // Si la réponse n'est pas OK (status >= 400)
             if (!response.ok) {
-                // Si la réponse contient un token CSRF (cas du login), on le met à jour
-                if (responseData.csrf_token) {
-                    csrfToken = responseData.csrf_token;
+                let errorData;
+                // On essaie de lire la réponse comme du JSON
+                if (contentType && contentType.includes('application/json')) {
+                    errorData = await response.json();
+                } else {
+                    // Si ce n'est pas du JSON, on lit comme du texte
+                    const textError = await response.text();
+                    // On crée un objet d'erreur standardisé
+                    errorData = { error: `Erreur du serveur (status ${response.status})`, details: textError };
                 }
-                // Propage l'erreur pour qu'elle soit attrapée par le code appelant
-                throw responseData;
+                // On propage l'erreur pour qu'elle soit gérée par le code appelant
+                throw errorData;
             }
+
+            // Si la réponse est OK, on s'attend à du JSON
+            // Gérer le cas où la réponse est OK mais vide (ex: status 204)
+            if (response.status === 204 || !contentType || !contentType.includes('application/json')) {
+                return null; // Ou un objet vide, selon la convention de l'API
+            }
+
+            const responseData = await response.json();
 
             // Si la réponse contient un token CSRF (cas du login), on le met à jour
             if (responseData.csrf_token) {

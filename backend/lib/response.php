@@ -7,6 +7,11 @@
  * @param int $statusCode Le code de statut HTTP à envoyer (par défaut 200).
  */
 function send_json_response($data, $statusCode = 200) {
+    // Nettoyer tout output qui aurait pu être généré avant (erreurs, espaces etc.)
+    if (ob_get_level() > 0) {
+        ob_clean();
+    }
+
     header('Content-Type: application/json; charset=utf-8');
     http_response_code($statusCode);
     echo json_encode($data);
