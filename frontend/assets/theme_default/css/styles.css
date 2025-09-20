@@ -191,3 +191,52 @@ button:hover, .button:hover {
         padding: 1rem;
     }
 }
+
+/* --- Admin Panel --- */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+}
+
+.user-table th,
+.user-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.user-table th {
+    background-color: var(--color-background);
+    font-weight: bold;
+}
+
+.user-table tr:last-child td {
+    border-bottom: none;
+}
+
+.user-table .actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.user-table .actions button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+}
+
+.promote-btn {
+    background-color: var(--color-secondary);
+}
+
+.promote-btn:hover {
+    background-color: #6cbf1a;
+}
+
+.demote-btn {
+    background-color: var(--color-error);
+}
+
+.demote-btn:hover {
+    background-color: #c84a46;
+}

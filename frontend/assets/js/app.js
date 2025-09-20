@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pages = document.querySelectorAll('.page');
     const navLoggedIn = document.querySelectorAll('.nav-item-logged-in');
     const navLoggedOut = document.querySelectorAll('.nav-item-logged-out');
+    const navAdmin = document.querySelectorAll('.nav-item-admin');
 
     const app = {
         // Affiche la page correspondante au hash et cache les autres
@@ -14,9 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // Met à jour l'UI en fonction de l'état de connexion
-        updateAuthState(isLoggedIn) {
+        updateAuthState(isLoggedIn, isAdmin = false) {
             navLoggedIn.forEach(item => item.style.display = isLoggedIn ? 'list-item' : 'none');
             navLoggedOut.forEach(item => item.style.display = isLoggedIn ? 'none' : 'list-item');
+            navAdmin.forEach(item => item.style.display = isLoggedIn && isAdmin ? 'list-item' : 'none');
         },
 
         // Logique de routage simple basée sur le hash
@@ -48,11 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Vérifier l'état de connexion initial (par exemple, en appelant l'endpoint /me)
             // Pour l'instant, on suppose déconnecté
-            this.updateAuthState(auth.isLoggedIn());
+            this.updateAuthState(auth.isLoggedIn(), auth.isUserAdmin());
 
             // Initialiser les autres modules
             auth.init();
             profile.init();
+            admin.init();
         }
     };
 

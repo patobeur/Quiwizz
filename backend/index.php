@@ -51,7 +51,8 @@ switch ($action) {
             send_json_response([
                 'message' => 'Connexion réussie.',
                 'user' => [
-                    'pseudo' => $_SESSION['user_pseudo']
+                    'pseudo' => $_SESSION['user_pseudo'],
+                    'is_admin' => $_SESSION['is_admin']
                 ],
                 'csrf_token' => $_SESSION['csrf_token']
             ]);
