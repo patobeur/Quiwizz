@@ -1,7 +1,14 @@
 const auth = (() => {
     let loggedIn = false;
+    let authReadyPromise;
+    let resolveAuthReady;
 
     function init() {
+        // Créer une promesse qui sera résolue lorsque l'authentification sera vérifiée
+        authReadyPromise = new Promise(resolve => {
+            resolveAuthReady = resolve;
+        });
+
         // Listeners pour les formulaires
         document.getElementById('login-form').addEventListener('submit', handleLogin);
         document.getElementById('register-form').addEventListener('submit', handleRegister);
@@ -31,6 +38,9 @@ const auth = (() => {
             }
             loggedIn = false;
             window.app.updateAuthState(false);
+        } finally {
+            // Résoudre la promesse pour indiquer que la vérification est terminée
+            resolveAuthReady();
         }
     }
 
@@ -131,8 +141,13 @@ const auth = (() => {
         return loggedIn;
     }
 
+    function waitForAuth() {
+        return authReadyPromise;
+    }
+
     return {
         init,
         isLoggedIn,
+        waitForAuth,
     };
 })();

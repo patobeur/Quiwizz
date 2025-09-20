@@ -20,6 +20,9 @@ const profile = (() => {
     }
 
     async function loadProfileAndBadgesData() {
+        // Attendre que la vérification d'authentification soit terminée
+        await auth.waitForAuth();
+
         // Ne rien faire si on n'est pas connecté
         if (!auth.isLoggedIn()) return;
 
