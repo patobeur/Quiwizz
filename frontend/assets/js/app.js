@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // Logique de routage simple basée sur le hash
-        handleRoute() {
+        async handleRoute() {
             let hash = window.location.hash.substring(1) || 'home';
 
             // Gérer les cas spéciaux comme le reset de mot de passe avec token
@@ -33,6 +33,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const pageId = `${hash}-page`;
+
+            // *** Sécurité : Vérification d'accès pour la page admin ***
+            if (hash === 'admin') {
+                // Attendre que l'authentification soit vérifiée
+                await auth.waitForAuth();
+                if (!auth.isUserAdmin()) {
+                    console.warn("Tentative d'accès non autorisé à la page admin.");
+                    window.location.hash = 'home'; // Redirection
+                    return; // Arrêter le traitement pour cette route
+                }
+            }
+
             if (document.getElementById(pageId)) {
                 app.showPage(pageId);
             } else {

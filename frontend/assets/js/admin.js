@@ -1,18 +1,120 @@
 const admin = (() => {
+    let adminSections = {};
+    let adminNavLinks = {};
 
     function init() {
-        // Cet event listener est un peu un hack. Idéalement, le routeur
-        // devrait appeler une fonction spécifique lors de l'affichage d'une page.
-        window.addEventListener('hashchange', () => {
-            if (window.location.hash === '#admin') {
-                loadUsers();
-            }
+        // Attendre que le DOM soit complètement chargé pour sélectionner les éléments
+        document.addEventListener('DOMContentLoaded', () => {
+            adminSections = {
+                dashboard: document.getElementById('admin-dashboard'),
+                users: document.getElementById('admin-users'),
+                polls: document.getElementById('admin-polls'),
+            };
+
+            adminNavLinks = document.querySelectorAll('.admin-nav-link');
+            adminNavLinks.forEach(link => {
+                link.addEventListener('click', handleAdminNav);
+            });
+
+            // Gérer la navigation initiale dans l'admin si on arrive directement sur une URL admin
+            handleAdminRoute();
         });
+
+        // Écouter les changements de hash pour la navigation
+        window.addEventListener('hashchange', handleAdminRoute);
+    }
+
+    function handleAdminRoute() {
+        const hash = window.location.hash;
+
+        // Ne rien faire si on n'est pas dans la section admin
+        if (!hash.startsWith('#admin')) {
+            return;
+        }
+
+        // Si on est sur #admin, rediriger vers #admin/dashboard
+        if (hash === '#admin') {
+            history.replaceState(null, '', '#admin/dashboard');
+        }
+
+        // Extraire la sous-route (ex: "dashboard", "users")
+        const subRoute = window.location.hash.split('/')[1] || 'dashboard';
+
+        showAdminSection(subRoute);
+    }
+
+    function handleAdminNav(e) {
+        e.preventDefault();
+        const targetSection = e.target.dataset.target;
+
+        // Mettre à jour l'URL sans recharger la page
+        history.pushState(null, '', `#admin/${targetSection}`);
+        showAdminSection(targetSection);
+    }
+
+    function showAdminSection(targetId) {
+        if (Object.keys(adminSections).length === 0) {
+            console.error("Les sections d'administration ne sont pas initialisées.");
+            return;
+        }
+
+        // Cacher toutes les sections
+        for (const key in adminSections) {
+            if (adminSections[key]) {
+                adminSections[key].style.display = 'none';
+            }
+        }
+
+        // Mettre à jour la classe 'active' sur les liens de navigation
+        adminNavLinks.forEach(link => {
+            link.classList.toggle('active', link.dataset.target === targetId);
+        });
+
+        // Afficher la section cible
+        if (adminSections[targetId]) {
+            adminSections[targetId].style.display = 'block';
+
+            // Charger les données spécifiques à la section si elle est affichée
+            if (targetId === 'users') {
+                loadUsers();
+            } else if (targetId === 'dashboard') {
+                loadDashboardData();
+            }
+        } else {
+            // Si la section n'existe pas, afficher le tableau de bord par défaut
+            if(adminSections.dashboard) adminSections.dashboard.style.display = 'block';
+        }
+    }
+
+    async function loadDashboardData() {
+        try {
+            const data = await api.get('admin/dashboard');
+            document.getElementById('stats-total-users').textContent = data.total_users;
+            document.getElementById('stats-total-polls').textContent = data.total_polls;
+            document.getElementById('stats-finished-polls').textContent = data.finished_polls;
+            document.getElementById('stats-total-badges').textContent = data.total_badges_awarded;
+
+            const leaderboardList = document.getElementById('leaderboard-points');
+            leaderboardList.innerHTML = '';
+            if (data.top_10_users_by_points.length > 0) {
+                 data.top_10_users_by_points.forEach(user => {
+                    const li = document.createElement('li');
+                    li.textContent = `${user.pseudo} - ${user.total_points} points`;
+                    leaderboardList.appendChild(li);
+                });
+            } else {
+                leaderboardList.innerHTML = '<li>Pas encore de données.</li>';
+            }
+
+        } catch (error) {
+            console.error("Erreur lors du chargement des données du tableau de bord", error);
+            // Afficher une erreur sur le tableau de bord
+        }
     }
 
     async function loadUsers() {
         const userListBody = document.getElementById('admin-user-list');
-        if (!userListBody) return; // Ne rien faire si on n'est pas sur la page admin
+        if (!userListBody) return;
 
         try {
             const users = await api.get('admin_get_users');
@@ -25,7 +127,7 @@ const admin = (() => {
 
     function renderUserTable(users) {
         const userListBody = document.getElementById('admin-user-list');
-        userListBody.innerHTML = ''; // Vider la table
+        userListBody.innerHTML = '';
 
         if (users.length === 0) {
             userListBody.innerHTML = '<tr><td colspan="5">Aucun utilisateur trouvé.</td></tr>';
@@ -47,11 +149,7 @@ const admin = (() => {
             userListBody.appendChild(tr);
         });
 
-        // Ajouter les event listeners aux nouveaux boutons
-        userListBody.querySelectorAll('.promote-btn').forEach(btn => {
-            btn.addEventListener('click', handleRoleChange);
-        });
-        userListBody.querySelectorAll('.demote-btn').forEach(btn => {
+        userListBody.querySelectorAll('.promote-btn, .demote-btn').forEach(btn => {
             btn.addEventListener('click', handleRoleChange);
         });
     }
@@ -67,14 +165,16 @@ const admin = (() => {
 
         try {
             await api.post(action, { user_id: userId });
-            loadUsers(); // Recharger la liste des utilisateurs pour voir le changement
+            loadUsers();
         } catch (error) {
             alert(`Erreur: ${error.error || 'Une erreur est survenue.'}`);
         }
     }
 
+    // Initialiser le module
+    init();
+
     return {
-        init,
-        loadUsers
+        // Aucune fonction n'a besoin d'être exposée publiquement pour l'instant
     };
 })();

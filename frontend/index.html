@@ -98,23 +98,73 @@
         </section>
 
         <section id="admin-page" class="page">
-            <h2>Panneau d'Administration</h2>
-            <div id="admin-user-list-container">
-                <h3>Gestion des utilisateurs</h3>
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Email</th>
-                            <th>Pseudo</th>
-                            <th>Admin</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-user-list">
-                        <!-- Les utilisateurs seront injectés ici par le JS -->
-                    </tbody>
-                </table>
+            <div class="admin-layout">
+                <aside class="admin-sidebar">
+                    <h3>Admin Menu</h3>
+                    <nav class="admin-nav">
+                        <ul>
+                            <li><a href="#admin/dashboard" class="admin-nav-link" data-target="dashboard">Tableau de bord</a></li>
+                            <li><a href="#admin/users" class="admin-nav-link" data-target="users">Gérer les utilisateurs</a></li>
+                            <li><a href="#admin/polls" class="admin-nav-link" data-target="polls">Gérer les sondages</a></li>
+                        </ul>
+                    </nav>
+                </aside>
+                <main class="admin-main-content">
+                    <!-- Section Tableau de bord -->
+                    <div id="admin-dashboard" class="admin-section">
+                        <h2>Tableau de bord</h2>
+                        <div class="dashboard-stats">
+                            <div class="stat-card">
+                                <h4>Utilisateurs</h4>
+                                <p id="stats-total-users">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Sondages</h4>
+                                <p id="stats-total-polls">0</p>
+                            </div>
+                             <div class="stat-card">
+                                <h4>Sondages Terminés</h4>
+                                <p id="stats-finished-polls">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Badges Obtenus</h4>
+                                <p id="stats-total-badges">0</p>
+                            </div>
+                        </div>
+                        <div class="dashboard-leaderboard">
+                            <h3>Top 10 Utilisateurs (par points)</h3>
+                            <ol id="leaderboard-points">
+                                <!-- Top users by points here -->
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Section Gestion des utilisateurs -->
+                    <div id="admin-users" class="admin-section" style="display: none;">
+                        <h2>Gestion des utilisateurs</h2>
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Email</th>
+                                    <th>Pseudo</th>
+                                    <th>Admin</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-user-list">
+                                <!-- Les utilisateurs seront injectés ici par le JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Section Gestion des sondages -->
+                    <div id="admin-polls" class="admin-section" style="display: none;">
+                        <h2>Gestion des sondages</h2>
+                        <p>La fonctionnalité de gestion des sondages sera bientôt disponible.</p>
+                        <!-- Le contenu pour la gestion des sondages ira ici -->
+                    </div>
+                </main>
             </div>
         </section>
 
