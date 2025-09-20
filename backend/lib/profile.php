@@ -8,7 +8,7 @@
  * @return array|null Les données du profil ou null si non trouvé.
  */
 function get_user_profile(PDO $pdo, int $userId): ?array {
-    $stmt = $pdo->prepare("SELECT id, email, pseudo, first_name, last_name, created_at FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, email, pseudo, first_name, last_name, is_admin, created_at FROM users WHERE id = ?");
     $stmt->execute([$userId]);
     $profile = $stmt->fetch();
 

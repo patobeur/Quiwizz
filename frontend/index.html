@@ -15,6 +15,7 @@
                 <li><a href="#home" class="nav-link">Accueil</a></li>
                 <li class="nav-item-logged-in" style="display: none;"><a href="#profile" class="nav-link">Profil</a></li>
                 <li class="nav-item-logged-in" style="display: none;"><a href="#badges" class="nav-link">Badges</a></li>
+                <li class="nav-item-admin" style="display: none;"><a href="#admin" class="nav-link">Admin</a></li>
                 <li class="nav-item-logged-out"><a href="#login" class="nav-link button">Connexion</a></li>
                 <li class="nav-item-logged-in" style="display: none;"><a href="#" id="logout-btn" class="nav-link button">Déconnexion</a></li>
             </ul>
@@ -96,6 +97,27 @@
             </form>
         </section>
 
+        <section id="admin-page" class="page">
+            <h2>Panneau d'Administration</h2>
+            <div id="admin-user-list-container">
+                <h3>Gestion des utilisateurs</h3>
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Pseudo</th>
+                            <th>Admin</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-user-list">
+                        <!-- Les utilisateurs seront injectés ici par le JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
         <section id="badges-page" class="page">
             <h2>Mes Badges</h2>
             <div id="badges-list" class="badges-container">
@@ -138,6 +160,7 @@
     <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/profile.js"></script>
+    <script src="assets/js/admin.js"></script>
     <script src="assets/js/app.js"></script>
 </body>
 </html>
