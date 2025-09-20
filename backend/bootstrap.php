@@ -1,5 +1,8 @@
 <?php
 
+// Démarrer la temporisation de sortie pour capturer toute sortie précoce (espaces, erreurs)
+ob_start();
+
 // Affiche toutes les erreurs si le mode debug est activé
 if (file_exists(__DIR__ . '/env.php') && (require __DIR__ . '/env.php')['DEBUG']) {
     ini_set('display_errors', 1);
