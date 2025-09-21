@@ -55,6 +55,7 @@ function create_tables_if_not_exists(PDO $pdo) {
         first_name VARCHAR(100),
         last_name VARCHAR(100),
         password_hash VARCHAR(255) NOT NULL,
+        total_points INT DEFAULT 0,
         is_admin INTEGER NOT NULL DEFAULT 0,
         reset_token VARCHAR(255),
         reset_expires_at DATETIME,
@@ -82,8 +83,38 @@ function create_tables_if_not_exists(PDO $pdo) {
         FOREIGN KEY (badge_id) REFERENCES badges(id) ON DELETE CASCADE
     );";
 
+    $sondages_sql = "
+    CREATE TABLE IF NOT EXISTS sondages (
+        id " . ($driver === 'sqlite' ? 'INTEGER PRIMARY KEY AUTOINCREMENT' : 'INT AUTO_INCREMENT PRIMARY KEY') . ",
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        status VARCHAR(10) NOT NULL DEFAULT 'draft',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );";
+
     // Exécuter les créations de table
     $pdo->exec($users_sql);
     $pdo->exec($badges_sql);
     $pdo->exec($user_badges_sql);
+    $pdo->exec($sondages_sql);
+
+    // Vérifier si la table des utilisateurs est vide
+    $stmt = $pdo->query("SELECT COUNT(*) FROM users");
+    $user_count = $stmt->fetchColumn();
+
+    if ($user_count == 0) {
+        // La table est vide, insérer l'utilisateur admin
+        $admin_email = 'quiwizz@quiwizz.fr';
+        $admin_pseudo = 'admin';
+        $admin_first_name = 'admin';
+        $admin_last_name = 'istrateur';
+        // Le mot de passe est 'admin' hashé avec PASSWORD_BCRYPT
+        $admin_password_hash = '$2y$10$CYsB/e/mroa4UJPmp7Y5Me4eKadWUGbAOHpbCDbUzrjfom.HDI5uy';
+        $is_admin = 1; // Mettre à 1 pour un administrateur
+
+        $insert_admin_sql = "INSERT INTO users (email, pseudo, first_name, last_name, password_hash, is_admin) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $pdo->prepare($insert_admin_sql);
+        $stmt->execute([$admin_email, $admin_pseudo, $admin_first_name, $admin_last_name, $admin_password_hash, $is_admin]);
+    }
 }
