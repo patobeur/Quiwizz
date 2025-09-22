@@ -37,6 +37,14 @@ const auth = (() => {
                 api.setCsrfToken(data.csrf_token);
             }
         } catch (error) {
+            // --- Vérification de l'installation ---
+            // Si l'API renvoie 'setup_required', on redirige vers la page d'installation.
+            if (error && error.setup_required) {
+                window.location.href = 'setup.php';
+                // On arrête le traitement pour éviter d'autres erreurs.
+                return;
+            }
+
             // L'erreur 401 est attendue si non connecté.
             if (error.status !== 401) {
                 console.error("Erreur lors de la vérification du statut d'authentification", error);

@@ -2,6 +2,26 @@
 
 require_once __DIR__ . '/bootstrap.php';
 
+// --- Vérification de l'installation ---
+// Si le fichier d'environnement n'existe pas, on lance la procédure d'installation.
+if (!file_exists(__DIR__ . '/env.php')) {
+    // On autorise uniquement l'action 'install' à passer.
+    if (($_REQUEST['action'] ?? '') === 'install' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        define('QUIWIZZ_INSTALL', true); // Sécurité pour s'assurer que le script n'est pas appelé directement
+        require_once __DIR__ . '/install.php';
+        exit;
+    }
+
+    // Pour toute autre action, on bloque avec une erreur indiquant que l'installation est requise.
+    header('Content-Type: application/json');
+    http_response_code(503); // 503 Service Unavailable
+    echo json_encode([
+        'setup_required' => true,
+        'error' => 'Application non installée. Veuillez procéder à l\'installation.'
+    ]);
+    exit;
+}
+
 // Gérer les requêtes JSON
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
     $json_data = file_get_contents('php://input');
