@@ -200,7 +200,33 @@
                 data['DEBUG'] = false;
             }
 
-            fetch('../backend/index.php?action=install', {
+            // Dynamically construct the API URL from the form's app_url value
+            const appUrlValue = document.getElementById('app_url').value.trim();
+            let apiUrl = '';
+
+            try {
+                // Use the URL object for robust path manipulation
+                const url = new URL(appUrlValue);
+
+                // Go "up" one level from the path. e.g., /quiwizz/frontend -> /quiwizz
+                // and then down to backend.
+                const pathParts = url.pathname.split('/').filter(p => p);
+                pathParts.pop(); // Remove the last part (e.g., 'frontend')
+
+                url.pathname = '/' + pathParts.join('/') + '/backend/index.php';
+                url.searchParams.set('action', 'install');
+
+                apiUrl = url.toString();
+            } catch (urlError) {
+                messageArea.className = 'message error';
+                messageArea.innerHTML = `<strong>Erreur :</strong> L'URL de l'application que vous avez fournie n'est pas une URL valide.`;
+                messageArea.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Installer QuiWizz';
+                return; // Stop execution
+            }
+
+            fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
