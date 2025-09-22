@@ -36,14 +36,22 @@ function generate_env_content(array $data): string {
     $env_content .= "return [\n";
 
     $bool_to_string = function($val) { return $val ? 'true' : 'false'; };
+    $is_sqlite = ($data['DB_DRIVER'] ?? '') === 'sqlite';
 
     foreach ($data as $key => $value) {
         if (in_array($key, ['admin_email', 'admin_pseudo', 'admin_password'])) continue;
 
         $env_content .= "    // -- Valeur pour $key --\n";
+
+        // Cas spécial pour le chemin SQLite pour le rendre absolu
+        if ($is_sqlite && $key === 'DB_PATH') {
+            $env_content .= "    'DB_PATH' => __DIR__ . '/" . addslashes($value) . "',\n\n";
+            continue;
+        }
+
         if (is_bool($value)) {
             $env_content .= "    '$key' => " . $bool_to_string($value) . ",\n\n";
-        } else if (is_numeric($value) && !in_array($key, ['DB_PORT'])) {
+        } else if (is_numeric($value) && !in_array($key, ['DB_PORT'], true)) {
              $env_content .= "    '$key' => $value,\n\n";
         } else {
              $env_content .= "    '$key' => '" . addslashes($value) . "',\n\n";

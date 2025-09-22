@@ -64,8 +64,8 @@
                 </div>
                 <div class="db-sqlite-fields">
                     <div class="form-group">
-                        <label for="db_path">Chemin de la base de données SQLite</label>
-                        <input type="text" id="db_path" name="DB_PATH" value="../backend/storage/app.db">
+                        <label for="db_path">Chemin de la base de données SQLite (relatif au dossier `backend`)</label>
+                        <input type="text" id="db_path" name="DB_PATH" value="storage/app.db">
                     </div>
                 </div>
                 <div class="db-mysql-fields">
