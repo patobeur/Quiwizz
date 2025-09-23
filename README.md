@@ -1,2 +1,3 @@
 # Quiwizz
-Quiz app with profil, points and badge manager
+
+Quiz app with profils, points and badges
